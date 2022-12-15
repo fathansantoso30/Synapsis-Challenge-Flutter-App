@@ -32,6 +32,7 @@ dependencies:
   intl: ^0.18.0
   geolocator: ^8.2.1
   battery_info: ^1.1.1
+  device_info_plus: ^5.0.1
 
 
 dev_dependencies:

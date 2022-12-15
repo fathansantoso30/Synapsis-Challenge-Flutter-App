@@ -5,14 +5,14 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:battery_info/battery_info_plugin.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+class ScreenA extends StatefulWidget {
+  const ScreenA({Key? key}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<ScreenA> createState() => _ScreenA();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _ScreenA extends State<ScreenA> {
   String? _timeValues;
   String? _dateValues;
   int? _batteryLevelValues;
