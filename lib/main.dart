@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:synapsis_challenge_app/b_screen.dart';
-import 'package:synapsis_challenge_app/login_screen.dart';
-import 'package:synapsis_challenge_app/a_screen.dart';
+// import 'package:synapsis_challenge_app/b_screen.dart';
+// import 'package:synapsis_challenge_app/login_screen.dart';
+// import 'package:synapsis_challenge_app/a_screen.dart';
+import 'package:synapsis_challenge_app/router.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
@@ -19,6 +20,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'Login Demo', home: ScreenA());
+    return MaterialApp.router(
+      routerConfig: router,
+    );
   }
 }
