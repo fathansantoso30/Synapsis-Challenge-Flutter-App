@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:battery_info/battery_info_plugin.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -11,18 +13,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String? _time;
-  String? _date;
+  String? _timeValues;
+  String? _dateValues;
+  int? _batteryLevelValues;
   List<double>? _accelerometerValues;
   List<double>? _userAccelerometerValues;
   List<double>? _gyroscopeValues;
   List<double>? _magnetometerValues;
+  List<double>? _coordinateValues;
   final _streamSubscriptions = <StreamSubscription<dynamic>>[];
 
   @override
   Widget build(BuildContext context) {
-    final time = _time;
-    final date = _date;
+    final time = _timeValues;
+    final date = _dateValues;
     final accelerometer =
         _accelerometerValues?.map((double v) => v.toStringAsFixed(1)).toList();
     final gyroscope =
@@ -32,7 +36,9 @@ class _MyHomePageState extends State<MyHomePage> {
         .toList();
     final magnetometer =
         _magnetometerValues?.map((double v) => v.toStringAsFixed(1)).toList();
-
+    final coordinate =
+        _coordinateValues?.map((double v) => v.toStringAsFixed(1)).toList();
+    final batteryLevel = _batteryLevelValues;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Page A'),
@@ -94,6 +100,24 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text('GPS Coordinate: $coordinate'),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text('Battery Level: $batteryLevel%'),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -111,6 +135,18 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
+    Stream<Position> getPosition() async* {
+      LocationPermission permission;
+
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      // When we reach here, permissions are granted and we can
+      // continue accessing the position of the device.
+      yield await Geolocator.getCurrentPosition();
+    }
+
     Stream<DateTime> getTime() async* {
       DateTime.now();
       while (true) {
@@ -120,14 +156,22 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     setState(() {
-      _date = DateFormat("dd-MM-yyyy").format(DateTime.now());
+      _dateValues = DateFormat("dd-MM-yyyy").format(DateTime.now());
     });
 
     _streamSubscriptions.add(getTime().listen((value) {
       setState(() {
-        _time = DateFormat("HH:mm:ss").format(value);
+        _timeValues = DateFormat("HH:mm:ss").format(value);
       });
     }));
+
+    _streamSubscriptions.add(getPosition().listen(
+      (Position event) {
+        setState(() {
+          _coordinateValues = <double>[event.latitude, event.longitude];
+        });
+      },
+    ));
 
     _streamSubscriptions.add(
       accelerometerEvents.listen(
@@ -165,5 +209,20 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       ),
     );
+    // _streamSubscriptions.add(
+    //   Geolocator.getPositionStream().listen(
+    //     (Position event) {
+    //       setState(() {
+    //         _coordinateValues = <double>[event.latitude, event.longitude];
+    //       });
+    //     },
+    //   ),
+    // );
+    _streamSubscriptions
+        .add(BatteryInfoPlugin().androidBatteryInfoStream.listen((event) {
+      setState(() {
+        _batteryLevelValues = event?.batteryLevel;
+      });
+    }));
   }
 }
