@@ -41,7 +41,7 @@ class _ScreenA extends State<ScreenA> {
     final batteryLevel = _batteryLevelValues;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Page A'),
+        title: const Text('Sensor Info'),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -209,15 +209,6 @@ class _ScreenA extends State<ScreenA> {
         },
       ),
     );
-    // _streamSubscriptions.add(
-    //   Geolocator.getPositionStream().listen(
-    //     (Position event) {
-    //       setState(() {
-    //         _coordinateValues = <double>[event.latitude, event.longitude];
-    //       });
-    //     },
-    //   ),
-    // );
     _streamSubscriptions
         .add(BatteryInfoPlugin().androidBatteryInfoStream.listen((event) {
       setState(() {
